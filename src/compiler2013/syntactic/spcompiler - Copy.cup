@@ -1,0 +1,345 @@
+package compiler2013.syntactic;
+
+import java.io.InputStream;
+import compiler2013.absyn.*;
+
+action code {:
+  static compiler2013.symbol.Symbol symbol(String s) {
+    return compiler2013.symbol.Symbol.getSymbol(s);
+  }
+:};
+
+parser code {:
+  public void report_error(String message, Object info) {
+    StringBuffer m = new StringBuffer("\tParsing error");
+    if (info instanceof java_cup.runtime.Symbol) {
+      java_cup.runtime.Symbol s = (java_cup.runtime.Symbol) info;
+
+      if (s.left >= 0) {
+        m.append(" in line " + (s.left +1 ));
+        if (s.right >= 0) {
+          m.append(", column " + (s.right + 1));
+        }
+      }
+    }
+    m.append(" : " + message);
+    System.err.println(m);
+  }
+
+  public Parser(InputStream inp) {
+    this(new Lexer(inp));
+  }
+:};
+
+terminal TYPEDEF, VOID, CHAR, INT, STRUCT, UNION;
+terminal IF, ELSE, WHILE, FOR, CONTINUE, BREAK, RETURN, SIZEOF;
+terminal LPAREN, RPAREN, LBRACE, RBRACE, LBRAKET, RBRAKET, COMMAR, SEMICOLON, DOT;
+terminal PARAAND, PARAOR, EQ, NE, LE, GE, LT, GT, NOT;
+terminal SHL, SHR, INC, DEC, PTR, ELLIPSIS;
+terminal ASSIGN, ADD_ASSIGN, SUB_ASSIGN, MUL_ASSIGN, DIV_ASSIGN, MOD_ASSIGN;
+terminal SHL_ASSIGN, SHR_ASSIGN, AND_ASSIGN, OR_ASSIGN, XOR_ASSIGN;
+terminal PLUS, MINUS, TIMES, DIVIDE, MOD, TIDLE, AND, OR, XOR;
+terminal Integer  NUM;
+terminal String   ID, TYPEID;
+terminal String   STRING;
+terminal char     CHARCONST;
+
+non terminal Decls        decls;
+non terminal Decl         decl;
+non terminal Declars      declars;
+non terminal Declar       declar;
+non terminal TypeDecl     typedecl;
+non terminal VarDecl      vardecl;
+non terminal Func         funcdef;
+non terminal Para         para;
+non terminal Decltors     decltors;
+non terminal InitDecltors initdecltors;
+non terminal InitDecltor  initdecltor;
+non terminal Initer       initer;
+non terminal Initers      initers;
+non terminal Ty           typespec;
+non terminal StructDecls   structdecls;
+non terminal PlDecl       pldecl;
+non terminal Decltor      decltor;
+non terminal ArrParas     arrparas;
+non terminal PlDecltor    pldecltor;
+non terminal Stmt         stmt;
+non terminal Stmts        stmts;
+non terminal ExprStmt     exprstmt;
+non terminal CpdStmt      cpdstmt;
+non terminal SelStmt      selstmt;
+non terminal IterStmt     iterstmt;
+non terminal JmpStmt      jmpstmt;
+non terminal Exprs        expr;
+non terminal Expr         assignexpr, constexpr, parorexpr, parandexpr, orexpr, xorexpr, andexpr, eqexpr;
+non terminal Expr         relationexpr, shiftexpr, addexpr, multiexpr, castexpr, unaryexpr, pfixexpr, primexpr;
+non terminal TypeName     typename;
+non terminal Arguments    arguments;
+
+precedence left         COMMAR;
+precedence right        INC, DEC, SIZEOF;
+precedence left         DOT, ELLIPSIS, PTR, ELSE;
+
+start with decls;
+
+decls ::= /* empty */   {: RESULT = null; :}
+        | decl:d decls:ds  {:
+            if (ds == null) RESULT = new Decls(d);
+            else { ds.list.addFirst(d); RESULT = ds; }
+        :}
+        ;
+
+decl ::= declar:d  {: RESULT = d; :}
+       | funcdef:fund   {: RESULT = fund; :}
+       ;
+
+declars ::= /* empty */   {: RESULT = null; :}
+          | declar:d declars:ds {:
+              if (ds == null) RESULT = new Declars(d);
+              else { ds.list.addFirst(d); RESULT = ds; }
+            :}
+          ;
+
+declar ::= typedecl:typd  {: RESULT = typd; :}
+          | vardecl:vard   {: RESULT = vard; :}
+          ;
+
+typedecl ::= TYPEDEF typespec:ts decltors:dtor
+            {:
+              for (int i = 0; i < dtor.list.size(); ++i) {
+                PlDecltor pdtor = dtor.list.get(i).pldecltor;
+                while (pdtor instanceof PtrPlDecltor) {
+                  PtrPlDecltor cc = (PtrPlDecltor) pdtor;
+                  pdtor = cc.pldecltor;
+                }
+                ParserTest.addTypeId(((SmpPlDecltor)pdtor).symbol.toString());
+                //System.out.println(pdtor.symbol.toString());
+              }
+            :} SEMICOLON 
+            {: 
+              RESULT = new TypeDecl(ts, dtor);
+            :}
+           ;
+
+vardecl ::= typespec:ts SEMICOLON  {: RESULT = new VarDecl(ts, null); :}
+          | typespec:ts initdecltors:idtor SEMICOLON {: RESULT = new VarDecl(ts, idtor); :}
+          ;
+
+funcdef ::= typespec:ts pldecltor:pdtor LPAREN RPAREN cpdstmt:body {: RESULT = new Func(ts, pdtor, null, false, body); :}
+          | typespec:ts pldecltor:pdtor LPAREN para:pr RPAREN cpdstmt:body  {: RESULT = new Func(ts, pdtor, pr, false, body); :}
+          | typespec:ts pldecltor:pdtor LPAREN para:pr COMMAR ELLIPSIS RPAREN cpdstmt:body  {: RESULT = new Func(ts, pdtor, pr, true, body); :}
+          ;
+
+para ::= pldecl:pd  {: RESULT = new Para(pd); :}
+       | para:pr COMMAR pldecl:pd   {: pr.list.addLast(pd); RESULT = pr; :}
+       ;
+
+decltors ::= decltor:dtor {: RESULT = new Decltors(dtor); :}
+           | decltor:dtor COMMAR decltors:dtors {: dtors.list.addFirst(dtor); RESULT = dtors; :}
+           ;
+
+initdecltors ::= initdecltor:idtor {: RESULT = new InitDecltors(idtor); :}
+               | initdecltor:idtor COMMAR initdecltors:idtors {: idtors.list.addFirst(idtor); RESULT = idtors; :}
+               ;
+
+initdecltor ::= decltor:dtor {: RESULT = new InitDecltor(dtor, null); :}
+              | decltor:dtor ASSIGN initer:iter {: RESULT = new InitDecltor(dtor, iter); :}
+              ;
+
+initer ::= assignexpr:aexpr {: RESULT = new PlIniter(aexpr); :}
+         | LBRACE initers:inters RBRACE {: RESULT = new CpdIniter(inters); :}
+         ;
+
+initers ::= initer:inter {: RESULT = new Initers(inter); :}
+          | initer:inter COMMAR initers:inters {: inters.list.addFirst(inter); RESULT = inters; :}
+          ;
+
+typespec ::= VOID   {: RESULT = new NameTy(symbol("void")); :}
+           | CHAR   {: RESULT = new NameTy(symbol("char")); :}
+           | INT  {: RESULT = new NameTy(symbol("int")); :}
+           | TYPEID:ti {: RESULT = new NameTy(symbol(ti)); :}
+           | STRUCT ID:i  {: RESULT  = new StructTy(symbol(i), null); :}
+           | UNION ID:i   {: RESULT = new UnionTy(symbol(i), null); :}
+           | STRUCT ID:i LBRACE structdecls:stds RBRACE {: RESULT = new StructTy(symbol(i), stds); :}
+           | UNION ID:i LBRACE structdecls:stds RBRACE {: RESULT = new UnionTy(symbol(i), stds); :}
+           | STRUCT LBRACE structdecls:stds RBRACE {: RESULT = new StructTy(stds); :}
+           | UNION LBRACE structdecls:stds RBRACE {: RESULT = new StructTy(stds); :}
+           ;
+
+structdecls ::= typespec:ty decltors:ds SEMICOLON {: RESULT = new StructDecls(ty, ds); :}
+              | typespec:ty decltors:ds SEMICOLON structdecls:stds {: stds.adds(ty, ds); RESULT = stds; :}
+              ;
+
+pldecl ::= typespec:ty decltor:dtor {: RESULT = new PlDecl(ty, dtor); :}
+         ;
+
+decltor ::= pldecltor:pdtor LPAREN para:pr RPAREN {: RESULT = new FuncDecltor(pdtor, pr, false); :}
+          | pldecltor:pdtor LPAREN para:pr COMMAR ELLIPSIS RPAREN {: RESULT = new FuncDecltor(pdtor, pr, true); :}
+          | pldecltor:pdtor LPAREN RPAREN {: RESULT = new FuncDecltor(pdtor, null, false); :}
+          | pldecltor:pdtor {: RESULT = new SmpDecltor(pdtor); :}
+          | pldecltor:pdtor arrparas:aprs {: RESULT = new ArrDecltor(pdtor, aprs); :}
+          ;
+
+arrparas ::= LBRAKET constexpr:cexpr RBRAKET {: RESULT = new ArrParas(cexpr); :}
+           | LBRAKET constexpr:cexpr RBRAKET arrparas:aprs {: aprs.list.addFirst(cexpr); RESULT = aprs; :}
+           ;
+
+pldecltor ::= ID:i {: RESULT = new SmpPlDecltor(symbol(i)); :}
+            | TIMES pldecltor:pdtor {: RESULT = new PtrPlDecltor(pdtor); :}
+            ;
+
+stmt ::= exprstmt:e {: RESULT = e; :}
+       | cpdstmt:c {: RESULT = c; :}
+       | selstmt:s {: RESULT = s; :}
+       | iterstmt:i {: RESULT = i; :}
+       | jmpstmt:j {: RESULT = j; :}
+       ;
+
+stmts ::= /* empty */   {: RESULT = null; :}
+        | stmt:st stmts:sts  {:
+            if (sts == null) RESULT = new Stmts(st);
+            else { sts.list.addFirst(st); RESULT = sts; }
+          :}
+        ;
+
+exprstmt ::= SEMICOLON {: RESULT = new ExprStmt(null); :}
+           | expr:e SEMICOLON {: RESULT = new ExprStmt(e); :}
+           ;
+
+cpdstmt ::= LBRACE {: ParserTest.beginScope(); :} declars:ds stmts:sts RBRACE {: ParserTest.endScope(); RESULT = new CpdStmt(ds, sts); :}
+          ;
+
+selstmt ::= IF LPAREN expr:e RPAREN stmt:s {: RESULT = new SelStmt(e, s, null); :}
+          | IF LPAREN expr:e RPAREN stmt:s ELSE stmt:x {: RESULT = new SelStmt(e, s, x); :}
+          ;
+
+iterstmt ::= WHILE LPAREN expr:e RPAREN stmt:s {: RESULT = new WhileStmt(e, s); :}
+           | FOR LPAREN SEMICOLON SEMICOLON RPAREN stmt:s {: RESULT = new ForStmt(null, null, null, s); :}
+           | FOR LPAREN expr:e SEMICOLON SEMICOLON RPAREN stmt:s {: RESULT = new ForStmt(e, null, null, s); :}
+           | FOR LPAREN SEMICOLON expr:e SEMICOLON RPAREN stmt:s {: RESULT = new ForStmt(null, e, null, s); :}
+           | FOR LPAREN SEMICOLON SEMICOLON expr:e RPAREN stmt:s {: RESULT = new ForStmt(null, null, e, s); :}
+           | FOR LPAREN expr:ea SEMICOLON expr:eb SEMICOLON RPAREN stmt:s {: RESULT = new ForStmt(ea, eb, null, s); :}
+           | FOR LPAREN expr:ea SEMICOLON SEMICOLON expr:ec RPAREN stmt:s {: RESULT = new ForStmt(ea, null, ec, s); :}
+           | FOR LPAREN SEMICOLON expr:eb SEMICOLON expr:ec RPAREN stmt:s {: RESULT = new ForStmt(null, eb, ec, s); :}
+           | FOR LPAREN expr:ea SEMICOLON expr:eb SEMICOLON expr:ec RPAREN stmt:s {: RESULT = new ForStmt(ea, eb, ec, s); :}
+           ;
+
+jmpstmt ::= CONTINUE SEMICOLON {: RESULT = new ContinueStmt(); :}
+          | BREAK SEMICOLON {: RESULT = new BreakStmt(); :}
+          | RETURN SEMICOLON  {: RESULT = new ReturnStmt(null); :}
+          | RETURN expr:e SEMICOLON {: RESULT = new ReturnStmt(e); :}
+          ;
+
+expr ::= assignexpr:aexpr {: RESULT = new Exprs(aexpr); :}
+       | assignexpr:aexpr COMMAR expr:e {: e.list.addFirst(aexpr); RESULT = e; :}
+       ;
+
+assignexpr ::= parorexpr:pore {: RESULT = pore; :}
+             | unaryexpr:ue ASSIGN assignexpr:ae {: RESULT = new Op(ue, ae, Op.OpType.ASSIGN); :}
+             | unaryexpr:ue MUL_ASSIGN assignexpr:ae {: RESULT = new Op(ue, ae, Op.OpType.MUL_ASSIGN); :}
+             | unaryexpr:ue DIV_ASSIGN assignexpr:ae {: RESULT = new Op(ue, ae, Op.OpType.DIV_ASSIGN); :}
+             | unaryexpr:ue MOD_ASSIGN assignexpr:ae {: RESULT = new Op(ue, ae, Op.OpType.MOD_ASSIGN); :}
+             | unaryexpr:ue ADD_ASSIGN assignexpr:ae {: RESULT = new Op(ue, ae, Op.OpType.ADD_ASSIGN); :}
+             | unaryexpr:ue SUB_ASSIGN assignexpr:ae {: RESULT = new Op(ue, ae, Op.OpType.SUB_ASSIGN); :}
+             | unaryexpr:ue SHL_ASSIGN assignexpr:ae {: RESULT = new Op(ue, ae, Op.OpType.SHL_ASSIGN); :}
+             | unaryexpr:ue SHR_ASSIGN assignexpr:ae {: RESULT = new Op(ue, ae, Op.OpType.SHR_ASSIGN); :}
+             | unaryexpr:ue AND_ASSIGN assignexpr:ae {: RESULT = new Op(ue, ae, Op.OpType.AND_ASSIGN); :}
+             | unaryexpr:ue XOR_ASSIGN assignexpr:ae {: RESULT = new Op(ue, ae, Op.OpType.XOR_ASSIGN); :}
+             | unaryexpr:ue OR_ASSIGN assignexpr:ae {: RESULT = new Op(ue, ae, Op.OpType.OR_ASSIGN); :}
+             ;
+
+constexpr ::= parorexpr:pore {: RESULT = pore; :}
+            ;
+
+parorexpr ::= parandexpr:pande {: RESULT = pande; :}
+            | parandexpr:pande PARAOR parorexpr:pore {: RESULT = new Op(pande, pore, Op.OpType.PARAOR); :}
+            ;
+
+parandexpr ::= orexpr:ore {: RESULT = ore; :}
+             | orexpr:ore PARAAND parandexpr:pande {: RESULT = new Op(ore, pande, Op.OpType.PARAAND); :}
+             ;
+
+orexpr ::= xorexpr:xore {: RESULT = xore; :}
+         | xorexpr:xore OR orexpr:ore {: RESULT = new Op(xore, ore, Op.OpType.OR); :}
+         ;
+
+xorexpr ::= andexpr:ande {: RESULT = ande; :}
+          | andexpr:ande XOR xorexpr:xore {: RESULT = new Op(ande, xore, Op.OpType.XOR); :}
+          ;
+
+andexpr ::= eqexpr:eqe {: RESULT = eqe; :}
+          | eqexpr:eqe AND andexpr:ande {: RESULT = new Op(eqe, ande, Op.OpType.AND); :}
+          ;
+
+eqexpr ::= relationexpr:re {: RESULT = re; :}
+         | relationexpr:re EQ eqexpr:eqe {: RESULT = new Op(re, eqe, Op.OpType.EQ); :}
+         | relationexpr:re NE eqexpr:eqe {: RESULT = new Op(re, eqe, Op.OpType.NE); :}
+         ;
+
+relationexpr ::= shiftexpr:se {: RESULT = se; :}
+               | shiftexpr:se LT relationexpr:re {: RESULT = new Op(se, re, Op.OpType.LT); :}
+               | shiftexpr:se GT relationexpr:re {: RESULT = new Op(se, re, Op.OpType.GT); :}
+               | shiftexpr:se LE relationexpr:re {: RESULT = new Op(se, re, Op.OpType.LE); :}
+               | shiftexpr:se GE relationexpr:re {: RESULT = new Op(se, re, Op.OpType.GE); :}
+               ;
+
+shiftexpr ::= addexpr:adde {: RESULT = adde; :}
+            | addexpr:adde SHL shiftexpr:sfte {: RESULT = new Op(adde, sfte, Op.OpType.SHL); :}
+            | addexpr:adde SHR shiftexpr:sfte {: RESULT = new Op(adde, sfte, Op.OpType.SHR); :}
+            ;
+
+addexpr ::= multiexpr:me {: RESULT = me; :}
+          | multiexpr:me PLUS addexpr:ae {: RESULT = new Op(me, ae, Op.OpType.PLUS); :}
+          | multiexpr:me MINUS addexpr:ae {: RESULT = new Op(me, ae, Op.OpType.MINUS); :}
+          ;
+
+multiexpr ::= castexpr:ce {: RESULT = ce; :}
+            | castexpr:ce TIMES multiexpr:me {: RESULT = new Op(ce, me, Op.OpType.TIMES); :}
+            | castexpr:ce DIVIDE multiexpr:me {: RESULT = new Op(ce, me, Op.OpType.DIVIDE); :}
+            | castexpr:ce MOD multiexpr:me {: RESULT = new Op(ce, me, Op.OpType.MOD); :}
+            ;
+
+castexpr ::= unaryexpr:ue {: RESULT = ue; :}
+           | LPAREN typename:ty RPAREN castexpr:ce {: RESULT = new CastExpr(ty, ce); :}
+           ;
+
+typename ::= typename:tn TIMES {: RESULT = new PtrTypeName(tn); :}
+           | typespec:ts {: RESULT = new SmpTypeName(ts); :}
+           ;
+
+unaryexpr ::= pfixexpr:pfe {: RESULT = pfe; :}
+            | INC unaryexpr:ue {: RESULT = new UnaryExpr(UnaryExpr.UnaryType.INC, ue); :}
+            | DEC unaryexpr:ue {: RESULT = new UnaryExpr(UnaryExpr.UnaryType.DEC, ue); :}
+            | AND castexpr:ce {: RESULT = new UnaryExpr(UnaryExpr.UnaryType.AND, ce); :}
+            | TIMES castexpr:ce {: RESULT = new UnaryExpr(UnaryExpr.UnaryType.TIMES, ce); :}
+            | PLUS castexpr:ce {: RESULT = new UnaryExpr(UnaryExpr.UnaryType.PLUS, ce); :}
+            | MINUS castexpr:ce {: RESULT = new UnaryExpr(UnaryExpr.UnaryType.MINUS, ce); :}
+            | TIDLE castexpr:ce {: RESULT = new UnaryExpr(UnaryExpr.UnaryType.TIDLE, ce); :}
+            | NOT castexpr:ce {: RESULT = new UnaryExpr(UnaryExpr.UnaryType.NOT, ce); :}
+            | SIZEOF unaryexpr:ue {: RESULT = new UnaryExpr(UnaryExpr.UnaryType.SIZEOF, ue); :}
+            | SIZEOF LPAREN typename:ty RPAREN {: RESULT = new TypeSizeExpr(ty); :}
+            ;
+
+pfixexpr ::= pfixexpr:pfe INC {: RESULT = new AccExpr(AccExpr.AccType.INC, pfe); :}
+           | pfixexpr:pfe DEC {: RESULT = new AccExpr(AccExpr.AccType.DEC, pfe); :}
+           | pfixexpr:pfe DOT ID:i {: RESULT = new PostfixExpr(pfe, symbol(i), PostfixExpr.PfType.DOT); :}
+           | pfixexpr:pfe PTR ID:i {: RESULT = new PostfixExpr(pfe, symbol(i), PostfixExpr.PfType.PTR); :}
+           | pfixexpr:pfe LBRAKET expr:e RBRAKET {: RESULT = new AdrsExpr(pfe, e); :}
+           | pfixexpr:pfe LPAREN arguments:ags RPAREN {: RESULT = new CallExpr(pfe, ags); :}
+           | primexpr:pre {: RESULT = pre; :}
+           ;
+
+arguments ::= /* empty */ {: RESULT = null; :}
+            | assignexpr:ae {: RESULT = new Arguments(ae); :}
+            | assignexpr:ae COMMAR arguments:ags {:
+                if (ags == null) RESULT = new Arguments(ae);
+                else { ags.list.addFirst(ae); RESULT = ags; }
+              :}
+            ;
+
+primexpr ::= ID:i {: RESULT = new Var(symbol(i)); :}
+           | NUM:n {: RESULT = new Num(n.intValue()); :}
+           | STRING:s {: RESULT = new StringConst(s); :}
+           | CHARCONST:ch {: RESULT = new CharConst(ch); :}
+           | LPAREN expr:e RPAREN {: RESULT = e; :}
+           ;

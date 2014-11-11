@@ -1,0 +1,162 @@
+Success!
+===========================================================================================
+testcases/board-5100379110-daibo.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	15104	Load:	3981	Store:	3506	Jumped:	1419
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/factor-5090379042-jiaxiao.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	187	Load:	39	Store:	38	Jumped:	35
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/gcd-5090379042-jiaxiao.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	293	Load:	44	Store:	43	Jumped:	61
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/hanoi2-5100309153-yanghuan.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	262112	Load:	28672	Store:	45051	Jumped:	45049
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/hanoi-5100379110-daibo.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	81887	Load:	10238	Store:	14329	Jumped:	14330
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/heapsort-5100379110-daibo.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	4813855	Load:	753455	Store:	483993	Jumped:	545743
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/hello-5090379042-jiaxiao.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	29	Load:	4	Store:	3	Jumped:	6
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/horse2-5100309153-yanghuan.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	7878920	Load:	1576466	Store:	1054051	Jumped:	1403742
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/horse3-5100309153-yanghuan.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	13432352	Load:	3745068	Store:	2810930	Jumped:	1653410
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/horse-5100309153-yanghuan.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	12213960	Load:	3315615	Store:	2790965	Jumped:	1563556
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/hpplus-5100309153-yanghuan.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	1950	Load:	134	Store:	155	Jumped:	313
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/inlinecheck-5100309153-yanghuan.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	104	Load:	15	Store:	14	Jumped:	23
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/magic-5100309153-yanghuan.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	1171089	Load:	433243	Store:	246235	Jumped:	110133
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/manyarguments-5100379110-daibo.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	254	Load:	29	Store:	28	Jumped:	56
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/manymanyarguments-5100379110-daibo.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	164	Load:	47	Store:	46	Jumped:	11
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/maxflow-5100379110-daibo.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	5772177	Load:	459591	Store:	23704	Jumped:	1331519
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/multiarray-5100309153-yanghuan.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	2965	Load:	308	Store:	239	Jumped:	458
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/nqueencon-5100379110-daibo.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	7606	Load:	370	Store:	369	Jumped:	1771
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/pi-5090379042-jiaxiao.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	5944691	Load:	281415	Store:	284252	Jumped:	848246
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/plus-5100309153-yanghuan.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	62	Load:	4	Store:	3	Jumped:	16
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/prime2-5100309153-yanghuan.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	2003169	Load:	518545	Store:	362408	Jumped:	151065
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/prime-5100309153-yanghuan.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	1933617	Load:	495361	Store:	346952	Jumped:	143337
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/qsort-5100379110-daibo.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	1617520	Load:	269944	Store:	154490	Jumped:	225892
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/queens-5100379110-daibo.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	523190	Load:	89958	Store:	65408	Jumped:	92554
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/self-5090379042-jiaxiao.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	104	Load:	10	Store:	18	Jumped:	19
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/selfref-5090379042-jiaxiao.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	49	Load:	7	Store:	6	Jumped:	11
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/spill2-5100379110-daibo.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	11548	Load:	1524	Store:	1284	Jumped:	2826
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/spill-5100379110-daibo.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	117	Load:	9	Store:	8	Jumped:	30
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/superloop-5090379042-jiaxiao.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	1685451	Load:	17	Store:	16	Jumped:	491007
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/tak-5090379042-jiaxiao.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	2076720	Load:	545703	Store:	545702	Jumped:	227382
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/test.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	4165	Load:	679	Store:	520	Jumped:	800
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
+testcases/twinprime-5090379042-jiaxiao.c
+Loaded: /usr/share/spim/exceptions.s
+[Statistics]	All:	590345	Load:	16763	Store:	50388	Jumped:	87553
+Files tmp/sp.out and tmp/gcc.out are identical
+===========================================================================================
